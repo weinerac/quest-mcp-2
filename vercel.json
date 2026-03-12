@@ -2,18 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.ts",
+      "src": "api/mcp.ts",
       "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/mcp",
-      "dest": "server.ts"
-    },
-    {
-      "src": "/",
-      "dest": "server.ts"
     }
   ]
 }
