@@ -1,9 +1,9 @@
-// Simple MCP server for ChatGPT compatibility
+// MCP server for Claude Desktop and ChatGPT compatibility
 export default async function handler(req, res) {
-  // Enable CORS
+  // Enable CORS for all origins
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-MCP-Version');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -14,16 +14,38 @@ export default async function handler(req, res) {
     res.json({
       status: 'ok',
       service: 'Quest Apartment Hotels MCP Server',
-      version: '1.0.0'
+      version: '1.0.0',
+      capabilities: {
+        tools: {},
+        resources: {}
+      }
     });
     return;
   }
 
   if (req.method === 'POST') {
     try {
-      const { method = 'tools/list', params } = req.body;
+      // Handle both Claude and ChatGPT request formats
+      const body = req.body;
+      let method, params;
       
-      // Handle tools/list - ChatGPT calls this first
+      // Claude Desktop format
+      if (body.method && body.params) {
+        method = body.method;
+        params = body.params;
+      }
+      // ChatGPT format
+      else if (body.method) {
+        method = body.method;
+        params = body.params;
+      }
+      // Default
+      else {
+        method = 'tools/list';
+        params = null;
+      }
+      
+      // Handle tools/list
       if (method === 'tools/list') {
         res.json({
           result: {
@@ -73,7 +95,7 @@ export default async function handler(req, res) {
         return;
       }
       
-      // Handle tools/call - ChatGPT calls this to execute tools
+      // Handle tools/call
       if (method === 'tools/call' && params) {
         const { name, arguments: args } = params;
         
@@ -223,8 +245,8 @@ export default async function handler(req, res) {
                       `📏 ${hotel.distance.toFixed(1)} km away\n` +
                       `⭐ ${hotel.rating}/5\n` +
                       `🏨 Amenities: ${hotel.amenities.join(', ')}\n` +
-                      `� From $${Math.min(...hotel.roomTypes.map(r => r.baseRate))}/night\n` +
-                      `�📞 ${hotel.phone}`
+                      `💰 From $${Math.min(...hotel.roomTypes.map(r => r.baseRate))}/night\n` +
+                      `📞 ${hotel.phone}`
                     ).join('\n\n')
                 },
                 {
@@ -362,7 +384,8 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error('MCP Error:', error);
       res.status(500).json({ 
-        error: error.message || 'Unknown error'
+        error: error.message || 'Unknown error',
+        details: error.stack
       });
     }
     return;

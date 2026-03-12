@@ -2,21 +2,15 @@
   "name": "quest-apartment-hotels-mcp",
   "version": "1.0.0",
   "description": "MCP server and app for Quest Apartment Hotels with location-based search",
-  "main": "mcp-server.js",
+  "main": "claude-server.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx mcp-server.ts",
-    "serve": "node mcp-server.js",
-    "start": "node mcp-server.js"
+    "dev": "tsx claude-server.ts",
+    "serve": "node claude-server.js",
+    "start": "node claude-server.js"
   },
-  "keywords": [
-    "mcp",
-    "quest",
-    "hotels",
-    "apartment",
-    "travel"
-  ],
+  "keywords": ["mcp", "quest", "hotels", "apartment", "travel"],
   "author": "Alex Weiner",
   "license": "MIT",
   "dependencies": {

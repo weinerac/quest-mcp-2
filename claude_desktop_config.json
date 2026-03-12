@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "quest-apartment-hotels": {
+      "command": "node",
+      "args": ["claude-server.js"],
+      "cwd": "/Users/alexweiner/CascadeProjects/quest-apartment-hotels-mcp"
+    }
+  }
+}
