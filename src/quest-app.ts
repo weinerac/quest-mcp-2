@@ -166,7 +166,8 @@ class QuestAppView {
     });
     this.results.innerHTML = `
       <section class="empty-state">
-        <p>The app renders the live output of \`quest_search_properties\` and lets you open full property details without hardcoded cards.</p>
+        <h3>No stays loaded yet</h3>
+        <p>The interface will switch from this editorial shell to live Quest search results as soon as ChatGPT runs \`quest_search_properties\`.</p>
       </section>
     `;
   }
@@ -205,19 +206,22 @@ class QuestAppView {
     return `
       <div class="summary-header">
         <p class="eyebrow">Quest Apartment Hotels</p>
-        <h1>Closest stays, rendered from MCP tool output</h1>
+        <h1>Find a stay that feels placed, not just nearby.</h1>
       </div>
       <div class="chip-row">
         ${chips.map((chip) => `<span class="chip">${chip}</span>`).join("") || `<span class="chip">Waiting for search input</span>`}
       </div>
       <p class="summary-copy">
-        ${payload.results.length > 0 ? `The cards below are generated from live structured MCP results.` : `The app stays empty until the server returns structured results.`}
+        ${payload.results.length > 0 ? `These stay cards are rendered from live MCP structured content and tuned to Quest’s warmer, membership-style visual language.` : `Use a landmark, city, or coordinates and the app will render the strongest Quest matches here.`}
       </p>
     `;
   }
 
   private renderCardMarkup(hotel: QuestHotel, rank: number, searchMode: SearchMode): string {
     const price = Math.min(...hotel.roomTypes.map((room) => room.baseRate));
+    const heroImage = hotel.imageUrl
+      ? `<img src="${hotel.imageUrl}" alt="${hotel.name}" />`
+      : `<div class="media-fallback"></div>`;
     const distanceMarkup =
       searchMode === "distance" && typeof hotel.distance === "number"
         ? `<span class="metric">${hotel.distance.toFixed(1)} km away</span>`
@@ -225,13 +229,17 @@ class QuestAppView {
 
     return `
       <article class="result-card">
-        <div class="result-topline">
-          <span class="rank">#${rank}</span>
-          ${distanceMarkup}
+        <div class="result-media">
+          ${heroImage}
+          <span class="media-badge">${hotel.state}</span>
         </div>
-        <div class="result-body">
+        <div class="result-column">
+          <div class="result-topline">
+            <span class="rank">#${rank} Match</span>
+            ${distanceMarkup}
+          </div>
           <div class="result-copy">
-            <h2>${hotel.name}</h2>
+            <h3>${hotel.name}</h3>
             <p class="address">${hotel.address}</p>
             <p class="description">${hotel.description}</p>
           </div>
@@ -245,16 +253,17 @@ class QuestAppView {
               <strong>$${price}</strong>
             </div>
             <div class="stat">
-              <span class="stat-label">Rooms</span>
+              <span class="stat-label">Stay Types</span>
               <strong>${hotel.roomTypes.length}</strong>
             </div>
           </div>
-        </div>
-        <div class="amenity-row">
-          ${hotel.amenities.slice(0, 5).map((amenity) => `<span class="amenity">${amenity}</span>`).join("")}
-        </div>
-        <div class="result-actions">
-          <button class="primary-button" data-action="view-property" data-property-id="${hotel.id}">View property</button>
+          <div class="amenity-row">
+            ${hotel.amenities.slice(0, 5).map((amenity) => `<span class="amenity">${amenity}</span>`).join("")}
+          </div>
+          <div class="result-actions">
+            <span class="pill">Quest curated stay</span>
+            <button class="primary-button" data-action="view-property" data-property-id="${hotel.id}">View property</button>
+          </div>
         </div>
       </article>
     `;
@@ -309,7 +318,7 @@ class QuestAppView {
           <strong>${hotel.rating.toFixed(1)}</strong>
         </div>
         <div class="detail-stat">
-          <span class="stat-label">From</span>
+          <span class="stat-label">From nightly</span>
           <strong>$${lowestRate}</strong>
         </div>
       </div>
@@ -323,7 +332,7 @@ class QuestAppView {
               <article class="room-card">
                 <div class="room-topline">
                   <h4>${room.name}</h4>
-                  <span>${room.available ? "Available" : "Unavailable"}</span>
+                  <span class="pill">${room.available ? "Available" : "Unavailable"}</span>
                 </div>
                 <p>${room.maxGuests} guests • ${room.beds} • ${room.size}</p>
                 <p>${room.amenities.join(", ")}</p>

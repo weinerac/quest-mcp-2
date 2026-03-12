@@ -7,14 +7,17 @@
     <style>
       :root {
         color-scheme: light dark;
-        --app-ink: var(--color-text-primary, #14213d);
-        --app-muted: var(--color-text-secondary, rgba(20, 33, 61, 0.72));
-        --app-surface: var(--color-background-primary, #f4efe5);
-        --app-panel: var(--color-background-secondary, rgba(255, 255, 255, 0.82));
-        --app-line: var(--color-border-primary, rgba(20, 33, 61, 0.14));
-        --app-accent: #cb5a2d;
-        --app-accent-soft: rgba(203, 90, 45, 0.12);
-        --app-shadow: 0 24px 60px rgba(20, 33, 61, 0.14);
+        --quest-clay: #c86636;
+        --quest-clay-deep: #a94f24;
+        --quest-sand: #f3efe8;
+        --quest-paper: rgba(255, 252, 247, 0.92);
+        --quest-olive: #57564d;
+        --quest-ink: var(--color-text-primary, #4f4b43);
+        --quest-muted: var(--color-text-secondary, rgba(79, 75, 67, 0.76));
+        --quest-line: rgba(109, 97, 82, 0.16);
+        --quest-chip: rgba(255, 247, 240, 0.24);
+        --quest-shadow: 0 24px 70px rgba(85, 69, 54, 0.12);
+        --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
         --font-sans-fallback: "Avenir Next", "Helvetica Neue", sans-serif;
       }
 
@@ -25,38 +28,69 @@
       body {
         margin: 0;
         min-height: 100vh;
-        color: var(--app-ink);
+        color: var(--quest-ink);
         font-family: var(--font-sans, var(--font-sans-fallback));
         background:
-          radial-gradient(circle at top left, rgba(203, 90, 45, 0.22), transparent 24rem),
-          radial-gradient(circle at top right, rgba(20, 33, 61, 0.16), transparent 22rem),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(244, 239, 229, 0.98));
+          linear-gradient(180deg, var(--quest-clay) 0 23rem, #ece8e1 23rem 100%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 35%);
       }
 
       .shell {
-        width: min(1120px, calc(100vw - 32px));
+        width: min(1180px, calc(100vw - 28px));
         margin: 0 auto;
-        padding: 24px 0 48px;
+        padding: 28px 0 56px;
+      }
+
+      .masthead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: white;
+        margin-bottom: 42px;
+      }
+
+      .brand-lockup {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-mark {
+        font-size: 2rem;
+        letter-spacing: 0.24em;
+      }
+
+      .brand-subtitle,
+      .nav-link,
+      .eyebrow,
+      .section-kicker,
+      .stat-label,
+      .label {
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .brand-subtitle,
+      .nav-link {
+        opacity: 0.82;
       }
 
       .hero {
         display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.6fr);
+        gap: 22px;
+        align-items: end;
+        color: white;
+      }
+
+      .hero-copy {
+        display: grid;
         gap: 18px;
-        padding: 24px;
-        border: 1px solid var(--app-line);
-        border-radius: 28px;
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(250, 246, 240, 0.7));
-        box-shadow: var(--app-shadow);
-        backdrop-filter: blur(14px);
+        max-width: 760px;
       }
 
       .eyebrow {
-        margin: 0 0 8px;
-        font-size: 0.72rem;
         font-weight: 700;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--app-accent);
       }
 
       h1,
@@ -67,24 +101,30 @@
         margin: 0;
       }
 
-      h1 {
-        font-size: clamp(2rem, 4vw, 3.75rem);
-        line-height: 0.96;
-        max-width: 14ch;
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-display);
+        font-weight: 500;
       }
 
-      .summary-copy,
-      .status-copy,
-      .address,
-      .description,
-      .detail-address,
-      .detail-description,
-      .room-card p {
-        color: var(--app-muted);
+      h1 {
+        font-size: clamp(2.5rem, 5vw, 4.7rem);
+        line-height: 0.94;
+        max-width: 11ch;
+      }
+
+      .hero-deck {
+        max-width: 58ch;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: rgba(255, 247, 239, 0.92);
       }
 
       .chip-row,
-      .amenity-row {
+      .amenity-row,
+      .fact-row {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
@@ -93,47 +133,158 @@
       .chip,
       .amenity,
       .metric,
+      .pill,
       .rank {
         display: inline-flex;
         align-items: center;
         border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 700;
+        font-size: 0.84rem;
       }
 
       .chip,
-      .amenity {
-        padding: 8px 12px;
-        background: rgba(20, 33, 61, 0.06);
+      .pill {
+        padding: 9px 13px;
+        background: var(--quest-chip);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: white;
       }
 
-      .status-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 0 4px;
+      .hero-card,
+      .results-panel,
+      .detail-panel,
+      .empty-state {
+        border-radius: 32px;
+        background: var(--quest-paper);
+        border: 1px solid var(--quest-line);
+        box-shadow: var(--quest-shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .hero-card {
+        padding: 22px;
+        color: var(--quest-ink);
+        background:
+          radial-gradient(circle at top right, rgba(200, 102, 54, 0.14), transparent 8rem),
+          linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(246, 242, 235, 0.92));
+      }
+
+      .hero-card h2 {
+        font-size: 1.8rem;
+        margin-top: 8px;
+      }
+
+      .hero-card p {
+        margin-top: 10px;
+        color: var(--quest-muted);
+        line-height: 1.6;
+      }
+
+      .fact-row {
         margin-top: 18px;
+      }
+
+      .fact {
+        flex: 1 1 120px;
+        min-width: 0;
+        padding-top: 16px;
+        border-top: 1px solid var(--quest-line);
+      }
+
+      .fact strong {
+        display: block;
+        font-size: 1.35rem;
+        margin-top: 6px;
+        font-family: var(--font-display);
+      }
+
+      .content {
+        display: grid;
+        gap: 22px;
+        margin-top: 34px;
+      }
+
+      .results-panel {
+        padding: 28px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      .section-head h2 {
+        font-size: clamp(2rem, 3vw, 3rem);
+        color: #5a564d;
+      }
+
+      .section-copy,
+      .status-copy,
+      .summary-copy,
+      .address,
+      .description,
+      .detail-address,
+      .detail-description,
+      .room-card p,
+      .empty-state p {
+        color: var(--quest-muted);
+      }
+
+      .status-copy {
+        max-width: 36ch;
+        line-height: 1.6;
       }
 
       .results-grid {
         display: grid;
         gap: 18px;
-        margin-top: 22px;
-      }
-
-      .result-card,
-      .detail-panel,
-      .empty-state {
-        border: 1px solid var(--app-line);
-        border-radius: 24px;
-        background: var(--app-panel);
-        box-shadow: var(--app-shadow);
-        backdrop-filter: blur(14px);
       }
 
       .result-card {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 18px;
         padding: 18px;
+        border: 1px solid rgba(109, 97, 82, 0.12);
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(247, 243, 237, 0.92));
+      }
+
+      .result-media {
+        position: relative;
+        min-height: 210px;
+        border-radius: 22px;
+        overflow: hidden;
+        background:
+          linear-gradient(135deg, rgba(94, 89, 77, 0.18), rgba(200, 102, 54, 0.22)),
+          #d6d1c8;
+      }
+
+      .result-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .media-badge {
+        position: absolute;
+        left: 14px;
+        top: 14px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255, 251, 245, 0.88);
+        color: var(--quest-clay-deep);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .result-column {
+        display: grid;
+        gap: 16px;
       }
 
       .result-topline,
@@ -147,22 +298,16 @@
       }
 
       .rank {
-        padding: 7px 11px;
-        background: var(--app-accent);
-        color: white;
+        padding: 8px 12px;
+        background: rgba(200, 102, 54, 0.12);
+        color: var(--quest-clay-deep);
+        font-weight: 700;
       }
 
       .metric {
-        padding: 7px 11px;
-        background: var(--app-accent-soft);
-        color: var(--app-accent);
-      }
-
-      .result-body {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 18px;
-        margin: 18px 0;
+        padding: 8px 12px;
+        background: rgba(87, 86, 77, 0.08);
+        color: var(--quest-olive);
       }
 
       .result-copy {
@@ -170,55 +315,71 @@
         gap: 10px;
       }
 
-      .result-copy h2,
+      .result-copy h3,
       .detail-header h3 {
-        font-size: 1.45rem;
+        font-size: 2rem;
+        color: #5b554d;
       }
 
-      .result-meta,
-      .detail-grid {
+      .description {
+        line-height: 1.7;
+      }
+
+      .result-meta {
         display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 12px;
       }
 
       .stat,
-      .detail-stat {
-        min-width: 120px;
-        padding: 12px 14px;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.68);
-        border: 1px solid rgba(20, 33, 61, 0.08);
+      .detail-stat,
+      .room-card {
+        padding: 15px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(109, 97, 82, 0.1);
       }
 
-      .stat-label {
+      .stat strong,
+      .detail-stat strong {
         display: block;
-        margin-bottom: 4px;
-        font-size: 0.78rem;
-        color: var(--app-muted);
+        margin-top: 6px;
+        font-size: 1.15rem;
+      }
+
+      .amenity {
+        padding: 8px 12px;
+        background: rgba(200, 102, 54, 0.08);
+        color: var(--quest-clay-deep);
       }
 
       .primary-button,
       .ghost-button {
         border: 0;
         border-radius: 999px;
-        padding: 12px 16px;
+        padding: 13px 18px;
         font: inherit;
         cursor: pointer;
+        transition: transform 180ms ease, background 180ms ease, color 180ms ease;
       }
 
       .primary-button {
-        background: var(--app-ink);
+        background: var(--quest-olive);
         color: white;
       }
 
+      .primary-button:hover,
+      .ghost-button:hover {
+        transform: translateY(-1px);
+      }
+
       .ghost-button {
-        background: rgba(20, 33, 61, 0.08);
-        color: var(--app-ink);
+        background: rgba(87, 86, 77, 0.08);
+        color: var(--quest-olive);
       }
 
       .detail-panel {
-        margin-top: 22px;
-        padding: 18px;
+        padding: 26px;
       }
 
       .detail-panel[hidden] {
@@ -230,22 +391,30 @@
         gap: 18px;
       }
 
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
       .room-list {
         display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 12px;
       }
 
       .room-card {
-        padding: 14px;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(20, 33, 61, 0.08);
         display: grid;
         gap: 8px;
       }
 
       .empty-state {
-        padding: 24px;
+        padding: 30px;
+      }
+
+      .empty-state h3 {
+        font-size: 2rem;
+        margin-bottom: 8px;
       }
 
       .detail-loading,
@@ -253,50 +422,106 @@
         padding: 12px 0;
       }
 
-      @media (max-width: 720px) {
-        .shell {
-          width: min(100vw - 20px, 1120px);
-          padding-top: 12px;
-        }
-
-        .hero,
-        .result-card,
-        .detail-panel {
-          border-radius: 20px;
-        }
-
-        .status-bar,
-        .result-body,
-        .detail-header,
-        .room-topline {
+      @media (max-width: 980px) {
+        .hero {
           grid-template-columns: 1fr;
-          flex-direction: column;
-          align-items: flex-start;
+        }
+
+        .result-card {
+          grid-template-columns: 1fr;
+        }
+
+        .result-media {
+          min-height: 240px;
         }
 
         .result-meta,
         .detail-grid {
-          width: 100%;
           grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          width: min(100vw - 18px, 1180px);
+          padding-top: 18px;
+        }
+
+        .masthead,
+        .section-head,
+        .result-topline,
+        .result-actions,
+        .detail-header,
+        .room-topline {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .results-panel,
+        .detail-panel,
+        .hero-card {
+          border-radius: 24px;
+          padding: 20px;
+        }
+
+        .result-meta,
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          max-width: 100%;
         }
       }
     </style>
   </head>
   <body>
     <main class="shell">
+      <header class="masthead">
+        <div class="brand-lockup">
+          <strong class="brand-mark">QUEST</strong>
+          <span class="brand-subtitle">Apartment Hotels</span>
+        </div>
+        <span class="nav-link">Interactive stay finder</span>
+      </header>
+
       <section class="hero">
-        <div id="summary"></div>
+        <div id="summary" class="hero-copy"></div>
+        <aside class="hero-card">
+          <p class="section-kicker">Search framing</p>
+          <h2>Curated for location-led stays</h2>
+          <p>
+            Match Quest properties to a landmark, city, or precise coordinates, then open the full stay profile without leaving the chat.
+          </p>
+          <div class="fact-row">
+            <div class="fact">
+              <span class="label">Result style</span>
+              <strong>Editorial cards</strong>
+            </div>
+            <div class="fact">
+              <span class="label">Interaction</span>
+              <strong>Inline details</strong>
+            </div>
+          </div>
+        </aside>
       </section>
 
-      <section class="status-bar">
-        <p id="status" class="status-copy"></p>
+      <section class="content">
+        <section class="results-panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Search results</p>
+              <h2>Closest Quest stays</h2>
+            </div>
+            <p id="status" class="status-copy"></p>
+          </div>
+          <section id="results" class="results-grid"></section>
+        </section>
+
+        <aside id="detail" class="detail-panel" hidden>
+          <div id="detail-content" class="detail-content"></div>
+        </aside>
       </section>
-
-      <section id="results" class="results-grid"></section>
-
-      <aside id="detail" class="detail-panel" hidden>
-        <div id="detail-content" class="detail-content"></div>
-      </aside>
     </main>
 
     <script type="module" src="./quest-app.ts"></script>
