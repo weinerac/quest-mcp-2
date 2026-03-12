@@ -2,18 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/main.js",
+      "src": "api/mcp.ts",
       "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/mcp",
-      "dest": "dist/main.js"
-    },
-    {
-      "src": "/",
-      "dest": "dist/main.js"
     }
   ]
 }
