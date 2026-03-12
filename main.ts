@@ -361,20 +361,252 @@ async function startHttpServer() {
   app.use(cors());
   app.use(express.json());
 
-  // MCP endpoint
-  app.post('/mcp', async (req, res) => {
+  // Handle MCP requests
+  app.all('/mcp', async (req, res) => {
     try {
-      // Handle MCP requests here
-      res.json({ status: 'ok' });
+      const { method = 'tools/call', params } = req.body;
+      
+      // Direct tool call handling
+      if (method === 'tools/call' && params) {
+        const { name, arguments: args } = params;
+        
+        // Handle tool calls directly
+        const result = await handleToolCall(name, args);
+        res.json(result);
+      } else {
+        // List tools
+        const result = await server.request({ method: 'tools/list' }, {} as any);
+        res.json(result);
+      }
     } catch (error) {
-      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+      console.error('MCP Error:', error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        details: error
+      });
     }
+  });
+
+  // Health check endpoint
+  app.get('/', (req, res) => {
+    res.json({
+      status: 'ok',
+      service: 'Quest Apartment Hotels MCP Server',
+      version: '1.0.0',
+      endpoints: {
+        mcp: '/mcp'
+      }
+    });
   });
 
   const port = process.env.PORT || 3001;
   app.listen(port, () => {
     console.log(`Quest MCP Server listening on port ${port}`);
   });
+}
+
+// Direct tool call handler
+async function handleToolCall(name: string, args: any) {
+  try {
+    switch (name) {
+      case 'quest_get_all_hotels': {
+        const schema = z.object({
+          state: z.string().optional(),
+          city: z.string().optional(),
+          amenities: z.array(z.string()).optional()
+        });
+        
+        const validated = schema.parse(args);
+        let results = [...questHotels];
+        
+        // Filter by state
+        if (validated.state) {
+          results = results.filter(hotel => 
+            hotel.state.toLowerCase() === validated.state!.toLowerCase()
+          );
+        }
+        
+        // Filter by city
+        if (validated.city) {
+          results = results.filter(hotel => 
+            hotel.city.toLowerCase().includes(validated.city!.toLowerCase())
+          );
+        }
+        
+        // Filter by amenities
+        if (validated.amenities && validated.amenities.length > 0) {
+          results = results.filter(hotel => 
+            validated.amenities!.every(amenity => 
+              hotel.amenities.some(hotelAmenity => 
+                hotelAmenity.toLowerCase().includes(amenity.toLowerCase())
+              )
+            )
+          );
+        }
+        
+        return {
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: `Found ${results.length} Quest Apartment Hotels:\n\n` +
+                  results.map(hotel => 
+                    `**${hotel.name}**\n` +
+                    `📍 ${hotel.address}\n` +
+                    `📞 ${hotel.phone}\n` +
+                    `⭐ ${hotel.rating}/5\n` +
+                    `🏨 ${hotel.amenities.length} amenities\n` +
+                    `💰 From $${Math.min(...hotel.roomTypes.map(r => r.baseRate))}/night\n` +
+                    `🆔 ${hotel.id}\n` +
+                    `📍 Coordinates: ${hotel.latitude}, ${hotel.longitude}`
+                  ).join('\n\n')
+              },
+              {
+                type: 'resource',
+                resource: {
+                  uri: 'quest-app://all-hotels',
+                  mimeType: 'application/json',
+                  name: 'All Quest Hotels',
+                  text: JSON.stringify(results)
+                }
+              }
+            ]
+          }
+        };
+      }
+
+      case 'quest_get_property_details': {
+        const schema = z.object({
+          propertyId: z.string()
+        });
+        
+        const validated = schema.parse(args);
+        const hotel = questHotels.find(h => h.id === validated.propertyId);
+        
+        if (!hotel) {
+          return {
+            result: {
+              content: [
+                {
+                  type: 'text',
+                  text: `Quest property not found: ${validated.propertyId}`
+                }
+              ]
+            }
+          };
+        }
+        
+        return {
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: `**${hotel.name}**\n\n` +
+                  `📍 ${hotel.address}\n` +
+                  `📞 ${hotel.phone}\n` +
+                  `${hotel.email ? `✉️ ${hotel.email}\n` : ''}` +
+                  `⭐ ${hotel.rating}/5\n\n` +
+                  `**Description:** ${hotel.description}\n\n` +
+                  `**Amenities:** ${hotel.amenities.join(', ')}\n\n` +
+                  `**Room Types:**\n` +
+                  hotel.roomTypes.map(room => 
+                    `• ${room.name} - ${room.maxGuests} guests, ${room.beds}, ${room.size}\n` +
+                    `  $${room.baseRate}/night ${room.available ? '✅ Available' : '❌ Unavailable'}\n` +
+                    `  ${room.amenities.join(', ')}`
+                  ).join('\n\n')
+              },
+              {
+                type: 'resource',
+                resource: {
+                  uri: 'quest-app://property-details',
+                  mimeType: 'application/json',
+                  name: 'Quest Property Details',
+                  text: JSON.stringify(hotel)
+                }
+              }
+            ]
+          }
+        };
+      }
+
+      case 'quest_calculate_distance': {
+        const schema = z.object({
+          latitude: z.number(),
+          longitude: z.number(),
+          maxDistance: z.number().optional(),
+          limit: z.number().optional().default(3)
+        });
+        
+        const validated = schema.parse(args);
+        
+        // Calculate distances from target coordinates
+        const hotelsWithDistance = questHotels.map(hotel => ({
+          ...hotel,
+          distance: calculateDistance(
+            validated.latitude, 
+            validated.longitude, 
+            hotel.latitude, 
+            hotel.longitude
+          )
+        }));
+        
+        // Sort by distance
+        hotelsWithDistance.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+        
+        // Filter by max distance if specified
+        let results = hotelsWithDistance;
+        if (validated.maxDistance) {
+          results = results.filter(hotel => (hotel.distance || 0) <= validated.maxDistance!);
+        }
+        
+        // Limit results
+        results = results.slice(0, validated.limit);
+        
+        return {
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: `Found ${results.length} Quest hotels within range:\n\n` +
+                  results.map(hotel => 
+                    `**${hotel.name}**\n` +
+                    `📍 ${hotel.address}\n` +
+                    `📏 ${hotel.distance?.toFixed(1)} km away\n` +
+                    `⭐ ${hotel.rating}/5\n` +
+                    `🏨 Amenities: ${hotel.amenities.join(', ')}\n` +
+                    `💰 From $${Math.min(...hotel.roomTypes.map(r => r.baseRate))}/night\n` +
+                    `📞 ${hotel.phone}`
+                  ).join('\n\n')
+              },
+              {
+                type: 'resource',
+                resource: {
+                  uri: 'quest-app://distance-results',
+                  mimeType: 'application/json',
+                  name: 'Hotels by Distance',
+                  text: JSON.stringify(results)
+                }
+              }
+            ]
+          }
+        };
+      }
+
+      default:
+        throw new Error(`Unknown tool: ${name}`);
+    }
+  } catch (error) {
+    return {
+      result: {
+        content: [
+          {
+            type: 'text',
+            text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }
+        ]
+      }
+    };
+  }
 }
 
 async function main() {
