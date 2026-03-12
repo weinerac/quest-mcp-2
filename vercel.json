@@ -3,7 +3,12 @@
   "builds": [
     {
       "src": "api/mcp.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "src/quest-app-inline.html"
+        ]
+      }
     }
   ],
   "routes": [

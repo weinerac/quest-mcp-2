@@ -244,8 +244,20 @@ function formatPropertyDetails(hotel: QuestHotel): string {
 }
 
 async function readBuiltUiHtml(): Promise<string> {
-  const uiPath = path.resolve(__dirname, "../dist/ui/quest-app.html");
-  return readFile(uiPath, "utf8");
+  const candidatePaths = [
+    path.resolve(__dirname, "./quest-app-inline.html"),
+    path.resolve(__dirname, "../dist/ui/quest-app.html"),
+  ];
+
+  for (const uiPath of candidatePaths) {
+    try {
+      return await readFile(uiPath, "utf8");
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error("Quest app HTML bundle was not found.");
 }
 
 export function createQuestServer(options?: { loadUiHtml?: () => Promise<string> }): McpServer {
