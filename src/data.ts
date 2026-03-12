@@ -1,4 +1,4 @@
-import { QuestHotel } from './types';
+import { QuestHotel } from './types.js';
 
 // Quest Apartment Hotels data - the MCP server provides this raw data
 export const questHotels: QuestHotel[] = [

@@ -1,320 +1,304 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quest Apartment Hotels</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+      :root {
+        color-scheme: light dark;
+        --app-ink: var(--color-text-primary, #14213d);
+        --app-muted: var(--color-text-secondary, rgba(20, 33, 61, 0.72));
+        --app-surface: var(--color-background-primary, #f4efe5);
+        --app-panel: var(--color-background-secondary, rgba(255, 255, 255, 0.82));
+        --app-line: var(--color-border-primary, rgba(20, 33, 61, 0.14));
+        --app-accent: #cb5a2d;
+        --app-accent-soft: rgba(203, 90, 45, 0.12);
+        --app-shadow: 0 24px 60px rgba(20, 33, 61, 0.14);
+        --font-sans-fallback: "Avenir Next", "Helvetica Neue", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--app-ink);
+        font-family: var(--font-sans, var(--font-sans-fallback));
+        background:
+          radial-gradient(circle at top left, rgba(203, 90, 45, 0.22), transparent 24rem),
+          radial-gradient(circle at top right, rgba(20, 33, 61, 0.16), transparent 22rem),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(244, 239, 229, 0.98));
+      }
+
+      .shell {
+        width: min(1120px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 24px 0 48px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 18px;
+        padding: 24px;
+        border: 1px solid var(--app-line);
+        border-radius: 28px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(250, 246, 240, 0.7));
+        box-shadow: var(--app-shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--app-accent);
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 4vw, 3.75rem);
+        line-height: 0.96;
+        max-width: 14ch;
+      }
+
+      .summary-copy,
+      .status-copy,
+      .address,
+      .description,
+      .detail-address,
+      .detail-description,
+      .room-card p {
+        color: var(--app-muted);
+      }
+
+      .chip-row,
+      .amenity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .chip,
+      .amenity,
+      .metric,
+      .rank {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .chip,
+      .amenity {
+        padding: 8px 12px;
+        background: rgba(20, 33, 61, 0.06);
+      }
+
+      .status-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 4px;
+        margin-top: 18px;
+      }
+
+      .results-grid {
+        display: grid;
+        gap: 18px;
+        margin-top: 22px;
+      }
+
+      .result-card,
+      .detail-panel,
+      .empty-state {
+        border: 1px solid var(--app-line);
+        border-radius: 24px;
+        background: var(--app-panel);
+        box-shadow: var(--app-shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .result-card {
+        padding: 18px;
+      }
+
+      .result-topline,
+      .result-actions,
+      .detail-header,
+      .room-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .rank {
+        padding: 7px 11px;
+        background: var(--app-accent);
+        color: white;
+      }
+
+      .metric {
+        padding: 7px 11px;
+        background: var(--app-accent-soft);
+        color: var(--app-accent);
+      }
+
+      .result-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        margin: 18px 0;
+      }
+
+      .result-copy {
+        display: grid;
+        gap: 10px;
+      }
+
+      .result-copy h2,
+      .detail-header h3 {
+        font-size: 1.45rem;
+      }
+
+      .result-meta,
+      .detail-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .stat,
+      .detail-stat {
+        min-width: 120px;
+        padding: 12px 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.68);
+        border: 1px solid rgba(20, 33, 61, 0.08);
+      }
+
+      .stat-label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.78rem;
+        color: var(--app-muted);
+      }
+
+      .primary-button,
+      .ghost-button {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 16px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .primary-button {
+        background: var(--app-ink);
+        color: white;
+      }
+
+      .ghost-button {
+        background: rgba(20, 33, 61, 0.08);
+        color: var(--app-ink);
+      }
+
+      .detail-panel {
+        margin-top: 22px;
+        padding: 18px;
+      }
+
+      .detail-panel[hidden] {
+        display: none;
+      }
+
+      .detail-content {
+        display: grid;
+        gap: 18px;
+      }
+
+      .room-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .room-card {
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(20, 33, 61, 0.08);
+        display: grid;
+        gap: 8px;
+      }
+
+      .empty-state {
+        padding: 24px;
+      }
+
+      .detail-loading,
+      .detail-error {
+        padding: 12px 0;
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          width: min(100vw - 20px, 1120px);
+          padding-top: 12px;
         }
 
-        :root {
-            --quest-blue: #0056b3;
-            --quest-light-blue: #e3f2fd;
-            --quest-gray: #6c757d;
-            --quest-light-gray: #f8f9fa;
-            --quest-dark: #2c3e50;
-            --quest-success: #28a745;
-            --quest-warning: #ffc107;
-            --quest-border: #dee2e6;
-            --quest-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            --quest-shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+        .hero,
+        .result-card,
+        .detail-panel {
+          border-radius: 20px;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: var(--quest-dark);
-            line-height: 1.6;
+        .status-bar,
+        .result-body,
+        .detail-header,
+        .room-topline {
+          grid-template-columns: 1fr;
+          flex-direction: column;
+          align-items: flex-start;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        .result-meta,
+        .detail-grid {
+          width: 100%;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .search-section {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: var(--quest-shadow);
-            margin-bottom: 30px;
-        }
-
-        .search-form {
-            display: grid;
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--quest-dark);
-        }
-
-        .form-group input,
-        .form-group select {
-            padding: 12px 16px;
-            border: 2px solid var(--quest-border);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--quest-blue);
-            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
-        }
-
-        .search-button {
-            background: var(--quest-blue);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .search-button:hover {
-            background: #004494;
-            transform: translateY(-2px);
-            box-shadow: var(--quest-shadow-hover);
-        }
-
-        .search-button:disabled {
-            background: var(--quest-gray);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .hotels-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .hotel-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--quest-shadow);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .hotel-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--quest-shadow-hover);
-        }
-
-        .hotel-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0),
-                        linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
-        }
-
-        .hotel-content {
-            padding: 24px;
-        }
-
-        .hotel-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--quest-dark);
-            margin-bottom: 8px;
-        }
-
-        .hotel-address {
-            color: var(--quest-gray);
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-        }
-
-        .hotel-rating {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .stars {
-            color: var(--quest-warning);
-            font-size: 1.1rem;
-        }
-
-        .distance {
-            background: var(--quest-light-blue);
-            color: var(--quest-blue);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .hotel-amenities {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .amenity-tag {
-            background: var(--quest-light-gray);
-            color: var(--quest-gray);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .hotel-price {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--quest-success);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: white;
-            font-size: 1.1rem;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #f5c6cb;
-        }
-
-        .no-results {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: var(--quest-shadow);
-        }
-
-        .no-results h3 {
-            color: var(--quest-dark);
-            margin-bottom: 12px;
-        }
-
-        .no-results p {
-            color: var(--quest-gray);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .hotels-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .search-section {
-                padding: 20px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Quest Apartment Hotels</h1>
-            <p>Find your perfect accommodation near any location or landmark</p>
-        </div>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div id="summary"></div>
+      </section>
 
-        <div class="search-section">
-            <form class="search-form" id="searchForm">
-                <div class="form-group">
-                    <label for="location">Location or Landmark</label>
-                    <input 
-                        type="text" 
-                        id="location" 
-                        placeholder="e.g., Sydney Opera House, Melbourne Cricket Ground, Brisbane CBD"
-                        required
-                    >
-                </div>
-                
-                <div class="form-group">
-                    <label for="amenities">Amenities (Optional)</label>
-                    <select id="amenities" multiple>
-                        <option value="Gym">Gym</option>
-                        <option value="Pool">Pool</option>
-                        <option value="WiFi">WiFi</option>
-                        <option value="Kitchen">Kitchen</option>
-                        <option value="Laundry">Laundry</option>
-                        <option value="Business Center">Business Center</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="guests">Number of Guests</label>
-                    <select id="guests">
-                        <option value="">Any</option>
-                        <option value="1">1 Guest</option>
-                        <option value="2">2 Guests</option>
-                        <option value="3">3 Guests</option>
-                        <option value="4">4+ Guests</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="search-button">Find Hotels</button>
-            </form>
-        </div>
+      <section class="status-bar">
+        <p id="status" class="status-copy"></p>
+      </section>
 
-        <div id="results">
-            <div class="loading">Ready to search for Quest Apartment Hotels...</div>
-        </div>
-    </div>
+      <section id="results" class="results-grid"></section>
+
+      <aside id="detail" class="detail-panel" hidden>
+        <div id="detail-content" class="detail-content"></div>
+      </aside>
+    </main>
 
     <script type="module" src="./quest-app.ts"></script>
-</body>
+  </body>
 </html>

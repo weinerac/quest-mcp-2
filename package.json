@@ -2,24 +2,37 @@
   "name": "quest-apartment-hotels-mcp",
   "version": "1.0.0",
   "description": "MCP server and app for Quest Apartment Hotels with location-based search",
-  "main": "claude-server.js",
+  "main": "dist/main.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx claude-server.ts",
-    "serve": "node claude-server.js",
-    "start": "node claude-server.js"
+    "build:ui": "vite build",
+    "build:server": "tsc",
+    "build": "npm run build:ui && npm run build:server",
+    "dev": "tsx main.ts",
+    "serve": "node dist/main.js",
+    "start": "node dist/main.js"
   },
-  "keywords": ["mcp", "quest", "hotels", "apartment", "travel"],
+  "keywords": [
+    "mcp",
+    "quest",
+    "hotels",
+    "apartment",
+    "travel"
+  ],
   "author": "Alex Weiner",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
-    "zod": "^3.22.4"
+    "@modelcontextprotocol/ext-apps": "^1.2.2",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "vite": "^5.4.21",
+    "vite-plugin-singlefile": "^2.3.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "tsx": "^4.0.0"
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
   }
 }

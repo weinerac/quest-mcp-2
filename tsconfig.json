@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,
@@ -16,8 +16,10 @@
     "sourceMap": true
   },
   "include": [
-    "*.ts",
-    "src/**/*"
+    "main.ts",
+    "src/data.ts",
+    "src/server-core.ts",
+    "src/types.ts"
   ],
   "exclude": [
     "node_modules",
