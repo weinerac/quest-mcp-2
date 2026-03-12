@@ -25,17 +25,10 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { method = 'tools/call', params } = req.body;
+      const { method = 'tools/list', params } = req.body;
       
-      // Direct tool call handling
-      if (method === 'tools/call' && params) {
-        const { name, arguments: args } = params;
-        
-        // Handle tool calls directly
-        const result = await handleToolCall(name, args);
-        res.json(result);
-      } else {
-        // List tools
+      // Handle tools/list
+      if (method === 'tools/list') {
         res.json({
           result: {
             tools: [
@@ -64,7 +57,21 @@ export default async function handler(req, res) {
             ]
           }
         });
+        return;
       }
+      
+      // Handle tools/call
+      if (method === 'tools/call' && params) {
+        const { name, arguments: args } = params;
+        
+        // Handle tool calls directly
+        const result = await handleToolCall(name, args);
+        res.json(result);
+        return;
+      }
+      
+      // Default response
+      res.json({ result: { tools: [] } });
       return;
     }
 
